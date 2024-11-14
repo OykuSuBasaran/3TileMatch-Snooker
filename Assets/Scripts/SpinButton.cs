@@ -6,6 +6,7 @@ public class SpinButton : MonoBehaviour
 {
     public static SpinButton Instance { get; private set; }
     public bool isSpinning = false;
+    private bool isSpinPressed = false;
 
     private Coroutine[] columnCoroutines = new Coroutine[5];
     private int[,] tilesOnBoard;
@@ -35,10 +36,14 @@ public class SpinButton : MonoBehaviour
 
     private void OnMouseDown()
     {
-        isSpinning = true;
-        StopButton.Instance.isStopped = false;
-        tilesOnBoard = new int[5, 5];
-        Board.Instance.ClearBoard();
+        if (!isSpinPressed)
+        {
+            isSpinning = true;
+            StopButton.Instance.isStopped = false;
+            tilesOnBoard = new int[5, 5];
+            Board.Instance.ClearBoard();
+        }
+        isSpinPressed = true;
     }
 
     public void Slot()

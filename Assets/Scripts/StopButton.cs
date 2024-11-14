@@ -8,6 +8,7 @@ public class StopButton : MonoBehaviour
     public float moveDuration = 1f;
 
     public bool isStopped = false;
+    private bool isStopPressed = false;
 
     public GameObject[] prefabs;
     private int[,] tilesOnBoard = new int[5,5];
@@ -88,8 +89,32 @@ public class StopButton : MonoBehaviour
         float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
         int columns = Board.Instance.columns;
         int rows = Board.Instance.rows;
+        float dropDuration = 1f;
+        float columnDelay = 0.2f;
+        float altsatir = yPosition - (4*cellSize + 4*spaceBetweenTiles);
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 4; i >= 0; i--)
+        {
+            for (int j = 0; j < 5; j++)
+            { 
+                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, 2.15f, 0), Quaternion.identity);
+                spawnedObjects.Add(spawnedObject);
+
+                // Hedef pozisyon, griddeki gerçek yeridir
+                Vector3 targetPosition = new Vector3(xPosition, altsatir, 0);
+
+                // DOTween ile düþme animasyonunu uygula
+                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear).SetDelay((1/(i+1) * columnDelay) + j * 0.1f);
+
+                // Sýradaki tile için x pozisyonunu güncelle
+                xPosition += cellSize + spaceBetweenTiles;
+            }
+            xPosition = tempStartX;
+            altsatir += (cellSize + spaceBetweenTiles);
+        }
+
+
+        /*for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < 5; j++)
             {
@@ -99,23 +124,28 @@ public class StopButton : MonoBehaviour
             }
             xPosition = tempStartX;
             yPosition -= (cellSize + spaceBetweenTiles);
-        }
+        }*/
+
     }
 
     private void OnMouseDown()
     {
-        isStopped = true;
-        SpinButton.Instance.isSpinning = false;
-        DecideTiles();
-        InstantiateTiles();
-        DOTween.To(() => moveDuration, x => moveDuration = x, moveDuration * 2f, 3f).OnComplete(() =>
+        if (!isStopPressed)
         {
-            // Bütün DOTween animasyonlarýný öldür ve coroutine'leri durdur
-            DOTween.KillAll(); // Tüm aktif animasyonlarý durdur
-            StopAllCoroutines(); // Tüm coroutine'leri durdur
-            Debug.Log("Animasyonlar tamamen durdu.");
-        });
-
+            isStopped = true;
+            SpinButton.Instance.isSpinning = false;
+            DecideTiles();
+            InstantiateTiles();
+            DOTween.To(() => moveDuration, x => moveDuration = x, moveDuration * 2f, 3f).OnComplete(() =>
+            {
+                // Bütün DOTween animasyonlarýný öldür ve coroutine'leri durdur
+                DOTween.KillAll(); // Tüm aktif animasyonlarý durdur
+                StopAllCoroutines(); // Tüm coroutine'leri durdur
+                Debug.Log("Animasyonlar tamamen durdu.");
+            });
+        }
+        isStopPressed = true;
+        
     }
 
 }
