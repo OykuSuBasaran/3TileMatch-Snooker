@@ -10,13 +10,14 @@ public class SpinButton : MonoBehaviour
 
     private Coroutine[] columnCoroutines = new Coroutine[5];
     private int[,] tilesOnBoard;
-    public float columnDelay = 0.5f;
-    public float spawnInterval = 0.25f;
+    public float columnDelay = 0.25f;
+    public float spawnInterval = 0.15f;
     public float moveDuration = 1f;
-    public float destroyYPosition = -2.15f;
+    public float destroyYPosition = -1.76f;
     public GameObject[] prefabs;
 
     List<GameObject> spawnedObjects = new List<GameObject>();
+
 
 
     // Awake fonksiyonu, bu sýnýfýn örneði oluþturulmadan önce çaðrýlýr
@@ -41,10 +42,13 @@ public class SpinButton : MonoBehaviour
             isSpinning = true;
             StopButton.Instance.isStopped = false;
             tilesOnBoard = new int[5, 5];
-            Board.Instance.ClearBoard();
+            //Board.Instance.ClearBoard();
         }
         isSpinPressed = true;
     }
+
+
+
 
     public void Slot()
     {
@@ -55,7 +59,7 @@ public class SpinButton : MonoBehaviour
         // Her sütun için ayrý bir coroutine baþlatýyoruz
     }
 
-    private IEnumerator SpawnColumn(int columnIndex)
+     private IEnumerator SpawnColumn(int columnIndex)
     //bu bloða yalnýzca coroutine oluþturulurken giriyor o yüzden while lar bir kez true oldu mu bir daha durmuyor
     {
         float xPosition, yPosition;
@@ -79,4 +83,6 @@ public class SpinButton : MonoBehaviour
         yield return new WaitForSeconds(spawnInterval);
 
     }
+
+    
 }

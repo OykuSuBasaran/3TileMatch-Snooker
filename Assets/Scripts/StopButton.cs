@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Runtime.CompilerServices;
 public class StopButton : MonoBehaviour
 {
     public static StopButton Instance { get; private set; }
@@ -13,6 +14,9 @@ public class StopButton : MonoBehaviour
     public GameObject[] prefabs;
     private int[,] tilesOnBoard = new int[5,5];
     List<GameObject> spawnedObjects = new List<GameObject>();
+
+
+
 
     // Awake fonksiyonu, bu sýnýfýn örneði oluþturulmadan önce çaðrýlýr
     private void Awake()
@@ -28,7 +32,6 @@ public class StopButton : MonoBehaviour
             DontDestroyOnLoad(gameObject); // Bu nesne sahne deðiþse bile yok olmasýn
         }
     }
-
 
     public void DecideTiles()
     {
@@ -80,7 +83,8 @@ public class StopButton : MonoBehaviour
         return false;
     }
 
-    public void InstantiateTiles()
+
+    /*public void InstantiateTiles()
     {
 
         float xPosition, yPosition;
@@ -90,59 +94,93 @@ public class StopButton : MonoBehaviour
         int columns = Board.Instance.columns;
         int rows = Board.Instance.rows;
         float dropDuration = 1f;
-        float columnDelay = 0.2f;
+        float columnDelay = 0.5f;
         float altsatir = yPosition - (4*cellSize + 4*spaceBetweenTiles);
 
-        for (int i = 4; i >= 0; i--)
+        for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < 5; j++)
             { 
-                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, 2.15f, 0), Quaternion.identity);
+                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
                 spawnedObjects.Add(spawnedObject);
 
                 // Hedef pozisyon, griddeki gerçek yeridir
                 Vector3 targetPosition = new Vector3(xPosition, altsatir, 0);
 
                 // DOTween ile düþme animasyonunu uygula
-                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear).SetDelay((1/(i+1) * columnDelay) + j * 0.1f);
+                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear).SetDelay((i * columnDelay) + j * 0.1f);
 
                 // Sýradaki tile için x pozisyonunu güncelle
                 xPosition += cellSize + spaceBetweenTiles;
             }
             xPosition = tempStartX;
             altsatir += (cellSize + spaceBetweenTiles);
-        }
-
-
-        /*for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < 5; j++)
-            {
-                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
-                spawnedObjects.Add(spawnedObject);
-                xPosition += cellSize + spaceBetweenTiles;
-            }
-            xPosition = tempStartX;
-            yPosition -= (cellSize + spaceBetweenTiles);
         }*/
 
+    private IEnumerator LastInstantiation(int columnIndex)
+    {
+        float xPosition, yPosition;
+        float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
+        float tempStartX = xPosition;
+        float tempStartY = yPosition;
+        float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
+        int columns = Board.Instance.columns;
+        int rows = Board.Instance.rows;
+        float dropDuration = 1.25f;
+        float columnDelay = 0.5f;
+        float altsatir = yPosition - (4 * cellSize + 4 * spaceBetweenTiles);
+        float altsatirTemp = altsatir;
+        float spawnInterval = 0.25f;
+
+        xPosition += columnIndex * (cellSize + spaceBetweenTiles);
+        yield return new WaitForSeconds(columnIndex * columnDelay);
+            for (int j = 4; j >= 0; j--) //row
+            {
+                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
+                spawnedObjects.Add(spawnedObject);
+
+                // Hedef pozisyon, griddeki gerçek yeridir
+                Vector3 targetPosition = new Vector3(xPosition, altsatir, 0);
+
+                // DOTween ile düþme animasyonunu uygula
+                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear);
+                // Sýradaki tile için x pozisyonunu güncelle
+                altsatir += (cellSize + spaceBetweenTiles);
+                yield return new WaitForSeconds(spawnInterval);
+            }
+
     }
+
+    private void StopSlot()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            StartCoroutine(LastInstantiation(i));
+        }
+    }
+    /*for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
+            spawnedObjects.Add(spawnedObject);
+            xPosition += cellSize + spaceBetweenTiles;
+        }
+        xPosition = tempStartX;
+        yPosition -= (cellSize + spaceBetweenTiles);
+    }*/
+
+
 
     private void OnMouseDown()
     {
         if (!isStopPressed)
         {
             isStopped = true;
-            SpinButton.Instance.isSpinning = false;
             DecideTiles();
-            InstantiateTiles();
-            DOTween.To(() => moveDuration, x => moveDuration = x, moveDuration * 2f, 3f).OnComplete(() =>
-            {
-                // Bütün DOTween animasyonlarýný öldür ve coroutine'leri durdur
-                DOTween.KillAll(); // Tüm aktif animasyonlarý durdur
-                StopAllCoroutines(); // Tüm coroutine'leri durdur
-                Debug.Log("Animasyonlar tamamen durdu.");
-            });
+            SpinButton.Instance.isSpinning = false;
+            DOTween.To(() => moveDuration, x => moveDuration = x, moveDuration * 1.2f, 3f);
+            StopSlot();
         }
         isStopPressed = true;
         
