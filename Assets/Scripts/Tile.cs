@@ -7,29 +7,42 @@ using DG.Tweening;
 public class Tile : MonoBehaviour
 {
 
-    private Vector3 startTouchPosition;
-    private Vector3 endTouchPosition;
+    private Vector2 startTouchPosition;
+    private Vector2 endTouchPosition;
 
     /*private void OnMouseDown()
     {
         Debug.Log("tiklandi objeye: " +  gameObject.transform.position);
     }*/
 
-    Vector3 GetBoardPosition()
-    {
-        return new (gameObject.transform.position.x, gameObject.transform.position.y);
-    }
 
     //Vector3 GetTargetPosition(){}
+
+    Vector3 GetTilePosition()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        return mousePosition;
+    }
 
     public void SwipeRight()
     {
         float xPosition, yPosition;
         float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
         float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
-        // Objeyi saða kaydýr
-        transform.DOMoveX(transform.position.x + (cellSize+spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
-
+        GameObject targetTile = Board.Instance.GetTileByPosition(endTouchPosition);
+        if (targetTile != null)
+        {
+            float tempTargetPosition = targetTile.transform.position.x;
+            float tempXPosition = gameObject.transform.position.x;
+            // Objeyi saða kaydýr
+            gameObject.transform.DOMoveX(tempXPosition + (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+            targetTile.transform.DOMoveX(tempTargetPosition - (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+        }
+        else {
+            Debug.LogWarning("Taþ dýþýna týkladýnýz. Ýþlem yapýlmadý.");
+            return; 
+        }
+   
     }
 
     public void SwipeLeft()
@@ -37,8 +50,20 @@ public class Tile : MonoBehaviour
         float xPosition, yPosition;
         float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
         float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
-        // Objeyi saða kaydýr
-        gameObject.transform.DOMoveX(transform.position.x - (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+        GameObject targetTile = Board.Instance.GetTileByPosition(endTouchPosition);
+        if (targetTile != null)
+        {
+            float tempTargetPosition = targetTile.transform.position.x;
+            float tempXPosition = gameObject.transform.position.x;
+            // Objeyi sola kaydýr
+            gameObject.transform.DOMoveX(tempXPosition - (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+            targetTile.transform.DOMoveX(tempTargetPosition + (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+        }
+        else
+        {
+            Debug.LogWarning("Taþ dýþýna týkladýnýz. Ýþlem yapýlmadý.");
+            return; 
+        }
     }
 
     public void SwipeUp()
@@ -46,9 +71,20 @@ public class Tile : MonoBehaviour
         float xPosition, yPosition;
         float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
         float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
-        // Objeyi saða kaydýr
-        gameObject.transform.DOMoveY(transform.position.y + (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
-
+        GameObject targetTile = Board.Instance.GetTileByPosition(endTouchPosition);
+        if (targetTile != null)
+        {
+            float tempTargetPosition = targetTile.transform.position.y;
+            float tempXPosition = gameObject.transform.position.y;
+            // Objeyi yukarý kaydýr
+            gameObject.transform.DOMoveY(tempXPosition + (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+            targetTile.transform.DOMoveY(tempTargetPosition - (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+        }
+        else
+        {
+            Debug.LogWarning("Taþ dýþýna týkladýnýz. Ýþlem yapýlmadý.");
+            return;
+        }
     }
 
     public void SwipeDown()
@@ -56,9 +92,20 @@ public class Tile : MonoBehaviour
         float xPosition, yPosition;
         float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
         float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
-        // Objeyi saða kaydýr
-        gameObject.transform.DOMoveY(transform.position.y - (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
-
+        GameObject targetTile = Board.Instance.GetTileByPosition(endTouchPosition);
+        if (targetTile != null)
+        {
+            float tempTargetPosition = targetTile.transform.position.y;
+            float tempXPosition = gameObject.transform.position.y;
+            // Objeyi aþaðý kaydýr
+            gameObject.transform.DOMoveY(tempXPosition - (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+            targetTile.transform.DOMoveY(tempTargetPosition + (cellSize + spaceBetweenTiles), 1f).SetEase(Ease.InOutQuad);
+        }
+        else
+        {
+            Debug.LogWarning("Taþ dýþýna týkladýnýz. Ýþlem yapýlmadý.");
+            return;
+        }
     }
 
     void DetectSwipe()
@@ -77,7 +124,18 @@ public class Tile : MonoBehaviour
         }
     }
 
-    /*    void Update()
+    void OnMouseDown()
+    {
+        startTouchPosition = Input.mousePosition; // Týklanan pozisyonu al
+    }
+
+    void OnMouseUp()
+    {
+        endTouchPosition = Input.mousePosition; // Fare býrakýldýðýnda pozisyonu al
+        DetectSwipe();
+    }
+
+    /*  void Update()
         {
             if (Input.touchCount > 0)
             {
@@ -95,14 +153,5 @@ public class Tile : MonoBehaviour
             }
         }*/
 
-    void OnMouseDown()
-    {
-        startTouchPosition = Input.mousePosition; // Týklanan pozisyonu al
-    }
 
-    void OnMouseUp()
-    {
-        endTouchPosition = Input.mousePosition; // Fare býrakýldýðýnda pozisyonu al
-        DetectSwipe();
-    }
 }

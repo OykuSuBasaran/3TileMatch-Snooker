@@ -1,3 +1,5 @@
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -24,7 +26,10 @@ public class Board : MonoBehaviour
     public int rows = 5;
     public GameObject backG; //initial konum için
     public float spaceBetweenTiles = 0.1f; //tie arasý
-    List<GameObject> spawnedObjects = new List<GameObject>();
+    public List<GameObject> spawnedObjects = new List<GameObject>();
+    //public GameObject[,] spawnedObjects = new GameObject[5,5];
+    public int[,] tilesOnBoard;
+
 
     public float CalculateBoardPlacements(out float initialPointX, out float initialPointY)
     {
@@ -35,14 +40,36 @@ public class Board : MonoBehaviour
         return cellSize;
     }
 
-    public void ClearBoard()
+    /*public void ClearBoard()
     {
         foreach (GameObject obj in spawnedObjects)
         {
             Destroy(obj);
         }
         spawnedObjects.Clear();
-    }
+    }*/
+
+
+    public GameObject GetTileByPosition(Vector2 mousePosition)
+    {
+        /*float xPosition, yPosition;
+        float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
+
+        int tileIndexY = Convert.ToInt32((yPosition - mousePosition.y) / (cellSize + spaceBetweenTiles));
+        int tileIndexX = Convert.ToInt32((mousePosition.x - xPosition) / (cellSize + spaceBetweenTiles));
+
+        Debug.Log("indexler: " + tileIndexX + tileIndexY);
+        return spawnedObjects[tileIndexY, tileIndexY];*/
+
+
+        RaycastHit2D hit2D = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+        if (hit2D.collider != null)
+        {
+            GameObject clickedObject = hit2D.collider.gameObject;
+            Debug.Log("Týklanan obje: " + clickedObject.name);
+            return clickedObject;
+        }
+        else { return null; }
+    }   
 
 }
-

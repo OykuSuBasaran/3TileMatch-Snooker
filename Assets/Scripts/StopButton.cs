@@ -13,9 +13,6 @@ public class StopButton : MonoBehaviour
 
     public GameObject[] prefabs;
     private int[,] tilesOnBoard = new int[5,5];
-    List<GameObject> spawnedObjects = new List<GameObject>();
-
-
 
 
     // Awake fonksiyonu, bu sýnýfýn örneði oluþturulmadan önce çaðrýlýr
@@ -137,7 +134,7 @@ public class StopButton : MonoBehaviour
             for (int j = 4; j >= 0; j--) //row
             {
                 GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
-                spawnedObjects.Add(spawnedObject);
+                Board.Instance.spawnedObjects.Add(spawnedObject);
 
                 // Hedef pozisyon, griddeki gerçek yeridir
                 Vector3 targetPosition = new Vector3(xPosition, altsatir, 0);

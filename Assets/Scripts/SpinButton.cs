@@ -9,14 +9,13 @@ public class SpinButton : MonoBehaviour
     private bool isSpinPressed = false;
 
     private Coroutine[] columnCoroutines = new Coroutine[5];
-    private int[,] tilesOnBoard;
+    //private int[,] tilesOnBoard;
     public float columnDelay = 0.25f;
     public float spawnInterval = 0.15f;
     public float moveDuration = 1f;
     public float destroyYPosition = -1.76f;
     public GameObject[] prefabs;
 
-    List<GameObject> spawnedObjects = new List<GameObject>();
 
 
 
@@ -41,7 +40,7 @@ public class SpinButton : MonoBehaviour
         {
             isSpinning = true;
             StopButton.Instance.isStopped = false;
-            tilesOnBoard = new int[5, 5];
+            Board.Instance.tilesOnBoard = new int[5, 5];
             //Board.Instance.ClearBoard();
         }
         isSpinPressed = true;
