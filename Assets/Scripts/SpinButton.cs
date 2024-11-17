@@ -7,6 +7,7 @@ public class SpinButton : MonoBehaviour
     public static SpinButton Instance { get; private set; }
     public bool isSpinning = false;
     private bool isSpinPressed = false;
+    public AudioSource audioSource;
 
     private Coroutine[] columnCoroutines = new Coroutine[5];
     //private int[,] tilesOnBoard;
@@ -36,6 +37,9 @@ public class SpinButton : MonoBehaviour
 
     private void OnMouseDown()
     {
+        transform.DORotate(new Vector3(0, 0, -360), 2f, RotateMode.FastBeyond360)
+                 .SetEase(Ease.InOutQuad);
+        audioSource.Play();
         if (!isSpinPressed)
         {
             isSpinning = true;

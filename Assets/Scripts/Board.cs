@@ -62,14 +62,17 @@ public class Board : MonoBehaviour
         return spawnedObjects[tileIndexY, tileIndexY];*/
 
 
-        RaycastHit2D hit2D = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+        RaycastHit2D hit2D = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit2D.collider != null)
         {
             GameObject clickedObject = hit2D.collider.gameObject;
-            Debug.Log("Týklanan obje: " + clickedObject.name);
-            return clickedObject;
+            if (clickedObject.GetComponent<Tile>() != null)
+            {
+                Debug.Log("Týklanan obje: " + clickedObject.name);
+                return clickedObject;
+            }
         }
-        else { return null; }
-    }   
-
+        return null;
+        
+    }
 }

@@ -13,7 +13,7 @@ public class StopButton : MonoBehaviour
 
     public GameObject[] prefabs;
     private int[,] tilesOnBoard = new int[5,5];
-
+    public AudioSource audioSource;
 
     // Awake fonksiyonu, bu sýnýfýn örneði oluþturulmadan önce çaðrýlýr
     private void Awake()
@@ -133,7 +133,7 @@ public class StopButton : MonoBehaviour
         yield return new WaitForSeconds(columnIndex * columnDelay);
             for (int j = 4; j >= 0; j--) //row
             {
-                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
+                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition+(cellSize+spaceBetweenTiles), 0), Quaternion.identity);
                 Board.Instance.spawnedObjects.Add(spawnedObject);
 
                 // Hedef pozisyon, griddeki gerçek yeridir
@@ -171,6 +171,9 @@ public class StopButton : MonoBehaviour
 
     private void OnMouseDown()
     {
+        transform.DORotate(new Vector3(0, 0, 360), 2f, RotateMode.FastBeyond360)
+                 .SetEase(Ease.InOutQuad);
+        audioSource.Play();
         if (!isStopPressed)
         {
             isStopped = true;
