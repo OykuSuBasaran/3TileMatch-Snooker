@@ -6,31 +6,51 @@ using System.Runtime.CompilerServices;
 public class StopButton : MonoBehaviour
 {
     public static StopButton Instance { get; private set; }
-    public float moveDuration = 1f;
-
+    private float dropDuration = 1.25f;
     public bool isStopped = false;
-    private bool isStopPressed = false;
+    public bool isStopPressed = false;
 
     public GameObject[] prefabs;
     private int[,] tilesOnBoard = new int[5,5];
     public AudioSource audioSource;
+    public GameObject cue;
 
-    // Awake fonksiyonu, bu sýnýfýn örneði oluþturulmadan önce çaðrýlýr
     private void Awake()
     {
-        // Eðer Instance zaten varsa ve bu instance bu sýnýf deðilse, o zaman bu nesneyi yok et
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject); // Ayný tipteki baþka bir nesneyi sil
+            Destroy(gameObject);
         }
         else
         {
-            Instance = this; // Bu nesneyi Singleton olarak ayarla
-            DontDestroyOnLoad(gameObject); // Bu nesne sahne deðiþse bile yok olmasýn
+            Instance = this; // This object is Singleton
+            DontDestroyOnLoad(gameObject);
         }
     }
 
-    public void DecideTiles()
+    private void OnMouseDown()
+    {
+        Sequence sequence = DOTween.Sequence();
+        sequence.Append(cue.transform.DOMoveX(cue.transform.position.x - 0.80f, 0.24f).SetLoops(2, LoopType.Yoyo));
+        sequence.Join(transform.DORotate(new Vector3(0, 0, 360), 1.7f, RotateMode.FastBeyond360)
+                 .SetEase(Ease.InOutQuad)); //starting button sprite animation when clickked 
+
+        audioSource.Play(); //playing an audio
+        if (!isStopPressed) //if the stop button is not pressed it can work
+        {
+            isStopped = true; //checking for the button manager
+            DecideTiles(); //when stop button is pressed, the last state of tiles on the board will be decided
+            SpinButton.Instance.isSpinning = false; //updating spin button's state for the button manager
+            SpinButton.Instance.isSpinPressed = false; //making spin button reusable
+            //DOTween.To(() => dropDuration, x => dropDuration = x, dropDuration * 1.2f, 3f); //when stopping, add tiles a slowing illusion 
+            StopSlot();
+        }
+        isStopPressed = true; //update flag, if stop button pressed it can not be used again till spin button is used again
+
+    }
+
+    public void DecideTiles() //This function ensures that the gameboard has each tile prefab at least three times by adjusting the first 21
+    //Also making sure that there are no consecutiveness more than two, both horizontal and vertical
     {
         int[] eachPrefabCount = new int[prefabs.Length];
         int tileCount = 0;
@@ -69,7 +89,7 @@ public class StopButton : MonoBehaviour
         }
     }
 
-    public bool IsConsecutive(int a, int b, int randomindex)
+    public bool IsConsecutive(int a, int b, int randomindex) //Checking if there are any consecutiveness by checking what's one and two before
     {
         if (a >= 2 && tilesOnBoard[a - 1, b] == randomindex && tilesOnBoard[a - 2, b] == randomindex)
             return true;
@@ -81,109 +101,42 @@ public class StopButton : MonoBehaviour
     }
 
 
-    /*public void InstantiateTiles()
-    {
-
-        float xPosition, yPosition;
-        float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
-        float tempStartX = xPosition;
-        float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
-        int columns = Board.Instance.columns;
-        int rows = Board.Instance.rows;
-        float dropDuration = 1f;
-        float columnDelay = 0.5f;
-        float altsatir = yPosition - (4*cellSize + 4*spaceBetweenTiles);
-
-        for (int i = 0; i < 5; i++)
-        {
-            for (int j = 0; j < 5; j++)
-            { 
-                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
-                spawnedObjects.Add(spawnedObject);
-
-                // Hedef pozisyon, griddeki gerçek yeridir
-                Vector3 targetPosition = new Vector3(xPosition, altsatir, 0);
-
-                // DOTween ile düþme animasyonunu uygula
-                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear).SetDelay((i * columnDelay) + j * 0.1f);
-
-                // Sýradaki tile için x pozisyonunu güncelle
-                xPosition += cellSize + spaceBetweenTiles;
-            }
-            xPosition = tempStartX;
-            altsatir += (cellSize + spaceBetweenTiles);
-        }*/
-
-    private IEnumerator LastInstantiation(int columnIndex)
-    {
-        float xPosition, yPosition;
-        float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
-        float tempStartX = xPosition;
-        float tempStartY = yPosition;
-        float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
-        int columns = Board.Instance.columns;
-        int rows = Board.Instance.rows;
-        float dropDuration = 1.25f;
-        float columnDelay = 0.5f;
-        float altsatir = yPosition - (4 * cellSize + 4 * spaceBetweenTiles);
-        float altsatirTemp = altsatir;
-        float spawnInterval = 0.25f;
-
-        xPosition += columnIndex * (cellSize + spaceBetweenTiles);
-        yield return new WaitForSeconds(columnIndex * columnDelay);
-            for (int j = 4; j >= 0; j--) //row
-            {
-                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition+(cellSize+spaceBetweenTiles), 0), Quaternion.identity);
-                Board.Instance.spawnedObjects.Add(spawnedObject);
-
-                // Hedef pozisyon, griddeki gerçek yeridir
-                Vector3 targetPosition = new Vector3(xPosition, altsatir, 0);
-
-                // DOTween ile düþme animasyonunu uygula
-                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear);
-                // Sýradaki tile için x pozisyonunu güncelle
-                altsatir += (cellSize + spaceBetweenTiles);
-                yield return new WaitForSeconds(spawnInterval);
-            }
-
-    }
-
-    private void StopSlot()
+    private void StopSlot() //Starting coroutine for each column, in this example it's 5
     {
         for (int i = 0; i < 5; i++)
         {
             StartCoroutine(LastInstantiation(i));
         }
     }
-    /*for (int i = 0; i < 5; i++)
+
+    private IEnumerator LastInstantiation(int columnIndex) //Coroutine for decided tiles to settle in their cells with slotlike animation
     {
-        for (int j = 0; j < 5; j++)
-        {
-            GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[i, j]], new Vector3(xPosition, yPosition, 0), Quaternion.identity);
-            spawnedObjects.Add(spawnedObject);
-            xPosition += cellSize + spaceBetweenTiles;
-        }
-        xPosition = tempStartX;
-        yPosition -= (cellSize + spaceBetweenTiles);
-    }*/
-
-
-
-    private void OnMouseDown()
-    {
-        transform.DORotate(new Vector3(0, 0, 360), 2f, RotateMode.FastBeyond360)
-                 .SetEase(Ease.InOutQuad);
-        audioSource.Play();
-        if (!isStopPressed)
-        {
-            isStopped = true;
-            DecideTiles();
-            SpinButton.Instance.isSpinning = false;
-            DOTween.To(() => moveDuration, x => moveDuration = x, moveDuration * 1.2f, 3f);
-            StopSlot();
-        }
-        isStopPressed = true;
+        float xPosition, yPosition;
+        float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
+        float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
+        int rows = Board.Instance.rows;
         
+        float columnDelay = 0.5f;
+        float lastLine = yPosition - (4 * cellSize + 4 * spaceBetweenTiles);
+        float spawnInterval = 0.25f;
+
+        xPosition += columnIndex * (cellSize + spaceBetweenTiles); //Prefab's x position when instantiating them, depending on columnIndex parameter
+        yield return new WaitForSeconds(columnIndex * columnDelay);
+            for (int j = rows-1; j >= 0; j--) //rows, in this example we have 5
+            {
+                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition+(cellSize+spaceBetweenTiles), 0), Quaternion.identity);
+                Board.Instance.spawnedObjects.Add(spawnedObject);
+
+                // Target position
+                Vector3 targetPosition = new Vector3(xPosition, lastLine, 0);
+
+                // Fall animation with DoMove 
+                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear);
+                //Updating y position by adding offset every iteration since the tiles fall from above and stop at the last row
+                lastLine += (cellSize + spaceBetweenTiles);
+                yield return new WaitForSeconds(spawnInterval);
+            }
+
     }
 
 }

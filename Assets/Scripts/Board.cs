@@ -14,20 +14,19 @@ public class Board : MonoBehaviour
     {
         if (Instance == null)
         {
-            Instance = this;
+            Instance = this; //singleton
         }
         else
         {
-            Destroy(gameObject); // Baþka bir instance varsa yok et
+            Destroy(gameObject); //if there is another object, destroy it
         }
     }
 
     public int columns = 5;
     public int rows = 5;
-    public GameObject backG; //initial konum için
-    public float spaceBetweenTiles = 0.1f; //tie arasý
+    public GameObject backG; //for initial position of the board
+    public float spaceBetweenTiles = 0.1f;
     public List<GameObject> spawnedObjects = new List<GameObject>();
-    //public GameObject[,] spawnedObjects = new GameObject[5,5];
     public int[,] tilesOnBoard;
 
 
@@ -40,39 +39,29 @@ public class Board : MonoBehaviour
         return cellSize;
     }
 
-    /*public void ClearBoard()
+    public void ClearBoard() //Clear objects on the board since its singleton
     {
         foreach (GameObject obj in spawnedObjects)
         {
             Destroy(obj);
         }
         spawnedObjects.Clear();
-    }*/
+    }
 
 
-    public GameObject GetTileByPosition(Vector2 mousePosition)
+    public GameObject GetTileByPosition(Vector2 mousePosition) //get the gameobject by the mouse position
     {
-        /*float xPosition, yPosition;
-        float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
-
-        int tileIndexY = Convert.ToInt32((yPosition - mousePosition.y) / (cellSize + spaceBetweenTiles));
-        int tileIndexX = Convert.ToInt32((mousePosition.x - xPosition) / (cellSize + spaceBetweenTiles));
-
-        Debug.Log("indexler: " + tileIndexX + tileIndexY);
-        return spawnedObjects[tileIndexY, tileIndexY];*/
-
-
         RaycastHit2D hit2D = Physics2D.Raycast(mousePosition, Vector2.zero);
         if (hit2D.collider != null)
         {
             GameObject clickedObject = hit2D.collider.gameObject;
             if (clickedObject.GetComponent<Tile>() != null)
             {
-                Debug.Log("Týklanan obje: " + clickedObject.name);
+                Debug.Log("Clicked Object: " + clickedObject.name);
                 return clickedObject;
             }
         }
-        return null;
-        
+        return null;        
     }
+
 }

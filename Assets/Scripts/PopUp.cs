@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 public class PopUp : MonoBehaviour
 {
     public static PopUp Instance { get; private set; }
@@ -10,25 +11,31 @@ public class PopUp : MonoBehaviour
     {
         if (Instance == null)
         {
-            Instance = this;
+            Instance = this; //singleton
         }
         else
         {
-            Destroy(gameObject); // Baþka bir instance varsa yok et
+            Destroy(gameObject);
         }
     }
-    public GameObject successPopUp; // Pop-up paneli burada referans alacaðýz.
+    public GameObject successPopUp; //Pop-up panel reference
     public AudioSource audioSource;
-    // Baþarýyla tamamlandýðýnda çaðrýlacak bir metot.
+    public GameObject confettiPrefab; //Prefab for the confetti particle animation
+
+
+    //When the match made, this will be called
     public void ShowSuccessPopUp()
     {
         audioSource.Play();
         Instantiate(successPopUp);
+        GameObject particles = Instantiate(confettiPrefab);
+        ParticleSystem ps = particles.GetComponent<ParticleSystem>();
+        ps.Play();
         //successPopUp.transform.DOScale(Vector3.one, 2f).SetEase(Ease.OutBack);
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // Kapatma fonksiyonu (Buton için kullanýlabilir).
+    //Not necessary for now, since the gameboard scene will reload automatically
     public void ClosePopUp()
     {
         Destroy(successPopUp);
