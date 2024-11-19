@@ -18,8 +18,6 @@ public class StopButton : MonoBehaviour
 
     private void Awake()
     {
-        //StopButton existingStopButton = FindObjectOfType<StopButton>();
-        //if (existingStopButton != null && existingStopButton != this)
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -118,28 +116,27 @@ public class StopButton : MonoBehaviour
         float cellSize = Board.Instance.CalculateBoardPlacements(out xPosition, out yPosition);
         float spaceBetweenTiles = Board.Instance.spaceBetweenTiles;
         int rows = Board.Instance.rows;
-        
+
         float columnDelay = 0.5f;
         float lastLine = yPosition - (4 * cellSize + 4 * spaceBetweenTiles);
         float spawnInterval = 0.25f;
 
         xPosition += columnIndex * (cellSize + spaceBetweenTiles); //Prefab's x position when instantiating them, depending on columnIndex parameter
         yield return new WaitForSeconds(columnIndex * columnDelay);
-            for (int j = rows-1; j >= 0; j--) //rows, in this example we have 5
-            {
-                GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition+(cellSize+spaceBetweenTiles), 0), Quaternion.identity);
-                Board.Instance.spawnedObjects.Add(spawnedObject);
+        for (int j = rows - 1; j >= 0; j--) //rows, in this example we have 5
+        {
+            GameObject spawnedObject = Instantiate(prefabs[tilesOnBoard[j, columnIndex]], new Vector3(xPosition, yPosition + (cellSize + spaceBetweenTiles), 0), Quaternion.identity);
+            Board.Instance.spawnedObjects.Add(spawnedObject);
 
-                // Target position
-                Vector3 targetPosition = new Vector3(xPosition, lastLine, 0);
+            // Target position
+            Vector3 targetPosition = new Vector3(xPosition, lastLine, 0);
 
-                // Fall animation with DoMove 
-                spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear);
-                //Updating y position by adding offset every iteration since the tiles fall from above and stop at the last row
-                lastLine += (cellSize + spaceBetweenTiles);
-                yield return new WaitForSeconds(spawnInterval);
-            }
-
+            // Fall animation with DoMove 
+            spawnedObject.transform.DOMove(targetPosition, dropDuration).SetEase(Ease.Linear);
+            //Updating y position by adding offset every iteration since the tiles fall from above and stop at the last row
+            lastLine += (cellSize + spaceBetweenTiles);
+            yield return new WaitForSeconds(spawnInterval);
+        }
     }
 
 }

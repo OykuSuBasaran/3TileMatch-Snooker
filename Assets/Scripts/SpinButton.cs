@@ -18,8 +18,6 @@ public class SpinButton : MonoBehaviour
 
     private void Awake()
     {
-        //SpinButton existingSpinButton = FindObjectOfType<SpinButton>();
-        //if (existingSpinButton != null && existingSpinButton != this)
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -86,6 +84,5 @@ public class SpinButton : MonoBehaviour
         yield return new WaitForSeconds(spawnInterval);
 
     }
-
-    
+   
 }
