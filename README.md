@@ -1,9 +1,9 @@
 # GrandGames-CaseStudy
 It'a 2D 3tilematch Unity game that has slot-like animations for Grand Games game developer case study. 
 I've tried a different consept which is a snooker theme. 
-All technical and game play requirements provided.   
+All technical and gameplay requirements provided.   
 
-In the video I've tried to show this:  
+In the video I've tried to show these:  
 - When you press the spin button it will start the slot animation. While it's working it can not be pressed again.  
 - When you press the stop button the final board placements will be decided. While it's working it can not be pressed again.  
 - As long as you don't touch the tiles, you can spin again.
