@@ -18,14 +18,17 @@ public class SpinButton : MonoBehaviour
 
     private void Awake()
     {
+        //SpinButton existingSpinButton = FindObjectOfType<SpinButton>();
+        //if (existingSpinButton != null && existingSpinButton != this)
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            Debug.Log("spin instance destroyed");
         }
         else
         {
             Instance = this; // This object is Singleton
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
     }
 

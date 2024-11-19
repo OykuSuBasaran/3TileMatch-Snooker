@@ -11,7 +11,6 @@ public class Buttons : MonoBehaviour //ButtonManager for Spin and Stop Buttons
     private float timeElapsed = 0f; // Time passed 
     public float interval = 0.25f; //  for limiting processed frames
 
-
     // Update is called once per frame
     void Update()
     {

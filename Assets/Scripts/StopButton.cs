@@ -15,8 +15,11 @@ public class StopButton : MonoBehaviour
     public AudioSource audioSource;
     public GameObject cue;
 
+
     private void Awake()
     {
+        //StopButton existingStopButton = FindObjectOfType<StopButton>();
+        //if (existingStopButton != null && existingStopButton != this)
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -24,7 +27,7 @@ public class StopButton : MonoBehaviour
         else
         {
             Instance = this; // This object is Singleton
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
     }
 

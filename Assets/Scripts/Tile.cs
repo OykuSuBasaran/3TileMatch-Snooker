@@ -222,7 +222,7 @@ public class Tile : MonoBehaviour
         {
             Vector2 controlPosition = reference + (direction * i * offset);
             GameObject controlledTile = Board.Instance.GetTileByPosition(controlPosition);
-            if(controlledTile == null) //for safety, if clicked outside of a tile
+            if(controlledTile == null) //for safety, if the origin tile is on the border 
             {
                 Debug.LogWarning("Tile is null for position: " + reference);
                 return matchedTiles;
