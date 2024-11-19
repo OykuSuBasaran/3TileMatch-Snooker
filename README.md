@@ -3,6 +3,8 @@ It'a 2D 3tilematch Unity game that has slot-like animations for Grand Games game
 I've tried a different consept which is a snooker theme. 
 All technical and gameplay requirements provided.   
 
+I shared the video with you via google drive due to its size. If you can not access it please contact me again.  
+
 In the video I've tried to show these:  
 - When you press the spin button it will start the slot animation. While it's working it can not be pressed again.  
 - When you press the stop button the final board placements will be decided. While it's working it can not be pressed again.  
