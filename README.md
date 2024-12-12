@@ -1,4 +1,4 @@
-# GrandGames-CaseStudy
+# 3TileMatch-SnookerTheme
 It'a 2D 3tilematch Unity game that has slot-like animations for Grand Games game developer case study. 
 I've tried a different consept which is a snooker theme. 
 All technical and gameplay requirements provided.   
